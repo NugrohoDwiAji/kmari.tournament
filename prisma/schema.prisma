@@ -1,0 +1,141 @@
+// ============================================================
+// Prisma Schema — Esports Tournament
+// Prisma ORM v7 — prisma-client-js dengan output lokal
+// ============================================================
+
+generator client {
+  // Provider: prisma-client-js (stabil, Rust-based engine)
+  // "prisma-client" (baru, Rust-free) — memerlukan driver adapter
+  provider = "prisma-client-js"
+
+  // output wajib di Prisma v7
+  // Client di-generate ke src/generated/prisma (bukan node_modules)
+  output = "../src/generated/prisma"
+}
+
+datasource db {
+  // URL sudah dipindahkan ke prisma.config.ts
+  // Tidak perlu url = env("DATABASE_URL") lagi di sini
+  provider = "mysql"
+}
+
+// ============================================================
+// Models
+// ============================================================
+
+model Group {
+  id        String     @id @default(cuid())
+  name      String     @unique // "A", "B", "C", "D"
+  teams     Team[]
+  matches   Match[]
+  standings Standing[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("groups")
+}
+
+model Team {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  logo        String?
+  groupId     String
+  group       Group      @relation(fields: [groupId], references: [id])
+  homeMatches Match[]    @relation("HomeTeam")
+  awayMatches Match[]    @relation("AwayTeam")
+  standings   Standing[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("teams")
+}
+
+model Match {
+  id          String       @id @default(cuid())
+  groupId     String
+  group       Group        @relation(fields: [groupId], references: [id])
+  homeTeamId  String
+  homeTeam    Team         @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeamId  String
+  awayTeam    Team         @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  round       Int          @default(1)
+  scheduledAt DateTime?
+  status      MatchStatus  @default(SCHEDULED)
+  result      MatchResult?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("matches")
+}
+
+model MatchResult {
+  id         String   @id @default(cuid())
+  matchId    String   @unique
+  match      Match    @relation(fields: [matchId], references: [id])
+  homeScore  Int      @default(0)
+  awayScore  Int      @default(0)
+  notes      String?
+  recordedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("match_results")
+}
+
+model Standing {
+  id           String   @id @default(cuid())
+  teamId       String
+  team         Team     @relation(fields: [teamId], references: [id])
+  groupId      String
+  group        Group    @relation(fields: [groupId], references: [id])
+  played       Int      @default(0)
+  won          Int      @default(0)
+  drawn        Int      @default(0)
+  lost         Int      @default(0)
+  goalsFor     Int      @default(0)
+  goalsAgainst Int      @default(0)
+  goalDiff     Int      @default(0)
+  points       Int      @default(0)
+  position     Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([teamId, groupId])
+  @@map("standings")
+}
+
+model BracketMatch {
+  id          String       @id @default(cuid())
+  round       BracketRound
+  matchNumber Int
+  team1Id     String?
+  team2Id     String?
+  team1Score  Int?
+  team2Score  Int?
+  winnerId    String?
+  status      MatchStatus  @default(SCHEDULED)
+  scheduledAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("bracket_matches")
+}
+
+// ============================================================
+// Enums
+// ============================================================
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  CANCELLED
+}
+
+enum BracketRound {
+  QUARTER_FINAL
+  SEMI_FINAL
+  FINAL
+  THIRD_PLACE
+}
