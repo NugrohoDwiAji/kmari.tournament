@@ -24,7 +24,7 @@ export function Navbar() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
               <Trophy className="w-4 h-4 text-white" />
             </div>
-            <span className="gradient-text">ESPORTS</span>
+            <span className="gradient-text">K.MARI TOURNAMENT</span>
           </Link>
 
           {/* Desktop */}
@@ -37,7 +37,7 @@ export function Navbar() {
                   "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
                   pathname === href
                     ? "bg-primary/20 text-primary border border-primary/30"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
                 )}
               >
                 <Icon className="w-4 h-4" />
@@ -67,7 +67,7 @@ export function Navbar() {
                   "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
                   pathname === href
                     ? "bg-primary/20 text-primary border border-primary/30"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
                 )}
               >
                 <Icon className="w-4 h-4" />
